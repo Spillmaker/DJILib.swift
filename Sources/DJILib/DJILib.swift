@@ -63,6 +63,46 @@ public class DJILib {
     public static let manufacturerDataOsmoAction5ProId     = Data([0x15, 0x00])
     public static let manufacturerDataOsmoPocket3Id        = Data([0x20, 0x00])
     
+    
+    public static func getModelFromManufacturerData(manufacturerData: Data) -> DJILib.Model? {
+        
+        guard manufacturerData.count >= 4 else {
+            //print("ManufacturerData is shorter than expected.")
+            return nil
+        }
+        
+        let manufacturerID = manufacturerData[0 ... 1]
+        guard manufacturerID == DJILib.manufacturerDataIdentifier else {
+            //print("Device does not have DJI manufacturer id.")
+            return nil
+        }
+        //print("Pheripheral with DJI manufacturer id found.")
+        
+
+        let modelId = manufacturerData[2 ... 3]
+        
+        if(modelId == DJILib.manufacturerDataOsmoAction3Id){
+            return .oa3
+        }
+        
+        if(modelId == DJILib.manufacturerDataOsmoAction4Id){
+            return .oa4
+        }
+        
+        if(modelId == DJILib.manufacturerDataOsmoAction5ProId){
+            return .oa5pro
+        }
+        
+        if(modelId == DJILib.manufacturerDataOsmoPocket3Id){
+            return .op3
+        }
+        
+        
+        return nil
+        
+    }
+    
+    
     public static let commandCharacteristicsUUID           = Data([0xFF, 0xF4])
     public static let dataCharacteristicsUUID              = Data([0xFF, 0xF5])
     
