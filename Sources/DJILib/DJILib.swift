@@ -271,6 +271,25 @@ public class DJILib {
         return Data([highByte, lowByte])
     }
     
+    public func getWiFiConfigurationCommand(ssid: String, password: String) -> Data{
+        
+        print("ssid \(ssid) Password: \(password)")
+        
+        var message = Data(ssid.data(using: .utf8)!)
+        message.append(Data([0x15])) // SPacer
+        message.append(Data(password.data(using: .utf8)!))
+        
+        let payload = generateFullPayload(
+            command: Data([0x02, 0x07]),
+            id: Data([0xB2, 0xEA]),
+            type: Data([0x40, 0x07, 0x47, 0x0A]),
+            data: message
+        )
+        Logger.log("Sending WiFi credentials to camera: \(payload?.hexEncodedString() ?? "No Data") ", level: .info)
+        return payload!
+    }
+    
+    
     public func getRTMPConfigCommand(rtmpURL: String, bitrate: Int, resolution: DJILib.BroadcastResolution, fps: Int, auto: Bool, eis: DJILib.BroadcastEISMode) -> Data{
         
         // Two first bits unknown, Next 5 is Stream settings. Rest us currently unknown
