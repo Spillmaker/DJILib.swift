@@ -1,0 +1,15 @@
+{
+  "originHash" : "edc73f059154d182a6d5fcceb2dd7fd82ba11205beda014130849400965d0368",
+  "pins" : [
+    {
+      "identity" : "crcswift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ivanesik/CrcSwift.git",
+      "state" : {
+        "revision" : "bb2fff7fb79815fad0528da71c9168d570bfc76c",
+        "version" : "0.0.3"
+      }
+    }
+  ],
+  "version" : 3
+}
