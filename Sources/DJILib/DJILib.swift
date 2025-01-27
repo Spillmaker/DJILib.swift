@@ -264,6 +264,105 @@ public class DJILib {
         return updateChecksumBits(payload: stopCommand)
     }
     
+    private func getBitrateHexes(bitrate: Int) -> Data{
+        let highByte = UInt8((bitrate >> 8) & 0xFF)
+        let lowByte = UInt8(bitrate & 0xFF)
+            
+        return Data([highByte, lowByte])
+    }
+    
+    public func getRTMPConfigCommand(rtmpURL: String, bitrate: Int, resolution: DJILib.BroadcastResolution, fps: Int, auto: Bool, eis: DJILib.BroadcastEISMode) -> Data{
+        
+        // Two first bits unknown, Next 5 is Stream settings. Rest us currently unknown
+        _ = Data([0x27, 0x00, 0x0A, 0x70, 0x17, 0x02, 0x00, 0x03, 0x00, 0x00, 0x00, 0x1C, 0x00])
+        var message = Data([0x27, 0x00, 0x04, 0xA0, 0x0F, 0x02, 0x01, 0x03, 0x00, 0x00, 0x00, 0x1C, 0x00])
+        message.append(Data(rtmpURL.data(using: .utf8)!))
+        
+                
+        // Bitrate
+        let bitrateData = getBitrateHexes(bitrate: bitrate)
+        message[4] = bitrateData[0]
+        message[5] = bitrateData[1]
+        
+        // 7 - Framerate
+        // TODO: Convert number to hex
+        if(fps == 25){
+            message[7] = 0x02 // 30fps TODO: s
+        }
+        if(fps == 30){
+            message[7] = 0x03 // 30fps TODO: s
+        }
+    
+        if(fps == 60){
+            message[7] = 0x06 // 30fps TODO: s
+        }
+        
+        //Resolution
+        switch(resolution){
+        case .sd:
+            message[2] = 0x47
+            break;
+        case .hd:
+            message[2] = 0x04
+            break;
+        case .fhd:
+            message[2] = 0x0A
+            break;
+        }
+        
+        
+        // Quality is Resolution + Bitrate so we dont need that
+        
+        // Define whetever "Auto" should be on or off.
+        message[6] = auto ? 0x01 : 0x00
+        var payload = generateFullPayload(
+            command: Data([0x02, 0x08]),
+            id: Data([0xBE, 0xEA]),
+            type: Data([0x40, 0x08, 0x78, 0x00]),
+            data: message
+        )
+        
+        // Append with the secondary EIS messaeg
+        // EIS
+        var eisMessage = Data([0x01, 0x01, 0x08, 0x00, 0x01, 0x02, 0xF0, 0x72])
+        switch(eis){
+        case .off:
+            eisMessage[5] = 0x00
+            break;
+        case .rockSteady:
+            eisMessage[5] = 0x02
+            break;
+        case .rockSteadyPlus:
+            eisMessage[5] = 0x03
+            break;
+        case .horizonBalancing:
+            eisMessage[5] = 0x04
+            break;
+        case .horizonSteady:
+            eisMessage[5] = 0x02
+            break;
+        }
+        let eisPayload = generateFullPayload(
+            command: Data([0x02, 0x01]),
+            id: getNextCountBits(),
+            type: Data([0x40, 0x02, 0x8E]),
+            data: eisMessage
+        )
+        
+        Logger.log("Generated secondary (EIS) Livestream-command: \(eisPayload?.hexEncodedString() ?? "No Data")", level: .info)
+        payload?.append(eisPayload!)
+        
+
+        
+        let updatedCommandDemo = get_start_broadcast_command()
+        Logger.log("Generated Third livestream-command needed for OA5P: \(updatedCommandDemo.hexEncodedString())", level: .info)
+
+        payload?.append(updatedCommandDemo)
+        Logger.log("Generated full Livestream-command: \(payload?.hexEncodedString() ?? "No Data")", level: .info)
+
+        return payload!
+    }
+    
     private static func log(_ items: Any..., separator: String = " ", terminator: String = "\n") {
         let prefix = "🔹 "
         let message = items.map { String(describing: $0) }.joined(separator: separator)
