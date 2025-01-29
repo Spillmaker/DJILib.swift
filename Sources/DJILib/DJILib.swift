@@ -561,7 +561,7 @@ public class DJILib {
         
     }
     
-    public func parseNotifyMessage(_ data: Data) -> Message{
+    public func parseNotifyMessage(_ data: Data, model: Model) -> Message{
         
         // If the payload is not large enough to parse a message, return unknown event.
         guard data.count >= 6 else {
@@ -653,7 +653,7 @@ public class DJILib {
             // Type: Wireless network
             if(data[9] == 0x07 && data[10] == 0xAC){
                 // Since we have recieved the WiFi List payload, we can now say that we are ready for credentials
-                return parseWifiListMessage(data: data)!
+                return parseWifiListMessage(data: data, model: model)!
             }
             
 
@@ -701,7 +701,7 @@ public class DJILib {
     }
     
     
-    func parseWifiListMessage(data: Data) -> DJILib.WifiListEvent?{
+    func parseWifiListMessage(data: Data, model: Model) -> DJILib.WifiListEvent?{
         
         guard data[0] == 0x55 else {
             print("[DJIDevice] Invalid message type. Must be full event from the camera.")
@@ -713,7 +713,10 @@ public class DJILib {
             return nil
         }
         
-        //return DJILib.WifiListEvent(rawData: data, wifiItems: [])
+        guard model != .oa5pro else {
+            return DJILib.WifiListEvent(rawData: data, wifiItems: [])
+            // TODO: Add parsing for oa5pro here. it seems to be different for some reason.
+        }
 
         var wifiDataItems: [Data] = []
         
