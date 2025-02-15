@@ -297,6 +297,10 @@ public class DJILib {
         var message = Data([0x27, 0x00, 0x04, 0xA0, 0x0F, 0x02, 0x01, 0x03, 0x00, 0x00, 0x00, 0x1C, 0x00])
         message.append(Data(rtmpURL.data(using: .utf8)!))
         
+        // Get hex length of rtmpUrl
+        let rtmpUrlByteCount = UInt8(rtmpURL.data(using: .utf8)?.count ?? 0)
+        
+        message[11] = UInt8(rtmpUrlByteCount)
                 
         // Bitrate
         let bitrateData = getBitrateHexes(bitrate: bitrate)

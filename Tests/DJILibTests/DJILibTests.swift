@@ -24,5 +24,21 @@ import Foundation
     #expect( DJILib.getModelFromManufacturerData(manufacturerData: Data([0xAA, 0x08, 0x15, 0x00]) ) == .oa5pro)
     #expect( DJILib.getModelFromManufacturerData(manufacturerData: Data([0xAA, 0x08, 0x20, 0x00]) ) == .op3)
     
+}
+
+@Test func rtmpUrlByteLengthCheck() async throws {
+    let djilb = DJILib()
+    let rtmpTest = djilb.getRTMPConfigCommand(
+        rtmpURL: "rtmp://192.168.1.123/publish/live/a/test", // should expect 0x28 in response base on this URL.
+        bitrate: 3000,
+        resolution: .fhd,
+        fps: 30,
+        auto: false,
+        eis: .rockSteady
+    )
     
+    
+    #expect(rtmpTest[23] == 0x28)
+    
+    print(rtmpTest.hexEncodedString())
 }
