@@ -271,18 +271,25 @@ public class DJILib {
         return Data([highByte, lowByte])
     }
     
+    private func getCountDataBit(_ data: Data) -> Data {
+        return Data([UInt8(data.count)])
+    }
+    
     public func getWiFiConfigurationCommand(ssid: String, password: String) -> Data{
         
         print("ssid \(ssid) Password: \(password)")
         
-        var message = Data(ssid.data(using: .utf8)!)
-        message.append(Data([0x15])) // SPacer
+
+        var message: Data = Data()
+        message.append(getCountDataBit(ssid.data(using: .utf8)!)) // The length of the SSID
+        message.append(Data(ssid.data(using: .utf8)!)) // The SSID
+        message.append(getCountDataBit(password.data(using: .utf8)!)) //The Length of the password
         message.append(Data(password.data(using: .utf8)!))
         
         let payload = generateFullPayload(
             command: Data([0x02, 0x07]),
             id: Data([0xB2, 0xEA]),
-            type: Data([0x40, 0x07, 0x47, 0x0A]),
+            type: Data([0x40, 0x07, 0x47]),
             data: message
         )
         Logger.log("Sending WiFi credentials to camera: \(payload?.hexEncodedString() ?? "No Data") ", level: .info)
