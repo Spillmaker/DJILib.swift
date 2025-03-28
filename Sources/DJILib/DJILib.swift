@@ -360,7 +360,7 @@ public class DJILib {
             eisMessage[5] = 0x00
             break;
         case .rockSteady:
-            eisMessage[5] = 0x02
+            eisMessage[5] = 0x01
             break;
         case .rockSteadyPlus:
             eisMessage[5] = 0x03
