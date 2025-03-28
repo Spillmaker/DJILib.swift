@@ -538,8 +538,8 @@ public class DJILib {
         public var wifiItems: [WiFiItem]
 
         public struct WiFiItem{
-            var ssid: String
-            var band: WiFiBand
+            public var ssid: String
+            public var band: WiFiBand
             
             public init(ssid: String, band: WiFiBand) {
                 self.ssid = ssid
