@@ -10,7 +10,7 @@ public class DJILib {
         case op3
     }
     
-    public enum BroadcastResolution: Int {
+    public enum BroadcastResolution: Int, Codable {
         case sd = 480
         case hd = 720
         case fhd = 1080
