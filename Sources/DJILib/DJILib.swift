@@ -16,7 +16,7 @@ public class DJILib {
         case fhd = 1080
     }
     
-    public enum BroadcastEISMode: String, CaseIterable {
+    public enum BroadcastEISMode: String, CaseIterable, Codable {
         case off = "Off"
         case rockSteady = "RockSteady"
         case rockSteadyPlus = "RockSteady +"
