@@ -66,8 +66,21 @@ public class DJILib {
     
     
     
-    public static let commandCharacteristicsUUID           = Data([0xFF, 0xF4])
-    public static let dataCharacteristicsUUID              = Data([0xFF, 0xF5])
+    private static let readCharacteristicsUUID   = Data([0xFF, 0xF4])
+    private static let writeCharacteristicsUUID  = Data([0xFF, 0xF5])
+    private static let oa5WriteCharacteristicsUUID = Data([0xFF, 0xF3])
+    
+    public func getReadCharacteristicsUUID(model: Model) -> Data {
+        // Read characteristic seem to be identical on all devices for now.
+        return DJILib.readCharacteristicsUUID
+    }
+    
+    public func getWriteCharacteristicsUUID(model: Model) -> Data {
+        if(model == .oa5pro){
+            return DJILib.oa5WriteCharacteristicsUUID
+        }
+        return DJILib.writeCharacteristicsUUID
+    }
     
     public static let part_cmd_startbit                    = Data([0x55])
     
