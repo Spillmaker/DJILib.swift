@@ -70,12 +70,12 @@ public class DJILib {
     private static let writeCharacteristicsUUID  = Data([0xFF, 0xF5])
     private static let oa5WriteCharacteristicsUUID = Data([0xFF, 0xF3])
     
-    public func getReadCharacteristicsUUID(model: Model) -> Data {
+    public static func getReadCharacteristicsUUID(model: Model) -> Data {
         // Read characteristic seem to be identical on all devices for now.
         return DJILib.readCharacteristicsUUID
     }
     
-    public func getWriteCharacteristicsUUID(model: Model) -> Data {
+    public static func getWriteCharacteristicsUUID(model: Model) -> Data {
         if(model == .oa5pro){
             return DJILib.oa5WriteCharacteristicsUUID
         }
