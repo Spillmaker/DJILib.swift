@@ -15,7 +15,7 @@ public class DJILib {
     // of iterating this byte onto the implementing app.
     // So i should remove this, but instead add a static function that iterates the inputted value for them.
     // countBit = DJILib.iterateCountBit(countBit: Data)
-    var idBytes: Data = Data([0x00, 0x00])
+    //var idBytes: Data = Data([0x00, 0x00])
     
     public enum Model {
         case oa3
@@ -109,7 +109,7 @@ public class DJILib {
     ///     - type: Sort of a 3 bytes category for the command. This is often if not always linked to the command bytes
     ///          TODO: Make a comprehensible list of all avaliable categories
     ///   - data: The payload of the message. dynamic length
-    func generateFullPayload(command: Data, id: Data, type: Data, data: Data) -> Data? {
+    private static func generateFullPayload(command: Data, id: Data, type: Data, data: Data) -> Data? {
         print("Sending dji command")
         
         guard command.count == 2 else {
@@ -169,32 +169,31 @@ public class DJILib {
         return fullData
     }
     
-    private func getNextCountBits() -> Data{
+    /// Returns an incremented count-bit
+    public static func getNextCountBits(countBit: Data) -> Data{
         
-        let nextBits = idBytes
+        var nextBits = countBit
         
         // Iterate
-        if idBytes[0] == 0xFF {
+        if nextBits[0] == 0xFF {
             // If primary counter reached its max, reset and iterate on the next one instead
-            idBytes[0] = 0x00
-            idBytes[1] += 1
+            nextBits[0] = 0x00
+            nextBits[1] += 1
         } else {
-            idBytes[0] += 1
+            nextBits[0] += 1
         }
-        
-        print("Used countBits \(nextBits.hexEncodedString()). Next bits available is \(idBytes.hexEncodedString())")
-        
+                
         return nextBits
     }
     
     
-    func stringToHexData(_ input: String) -> Data {
+    private static func stringToHexData(_ input: String) -> Data {
         return Data(input.utf8.map { $0 })
     }
     
     // Auth commands
     // This is withouht the pin code i think.
-    public static let authCommand = Data([
+    private let authCommand = Data([
         0x20, 0x32, 0x38, 0x34, 0x61, 0x65, 0x35, 0x62,
         0x38, 0x64, 0x37, 0x36, 0x62, 0x33, 0x33, 0x37,
         0x35, 0x61, 0x30, 0x34, 0x61, 0x36, 0x34, 0x31,
@@ -203,7 +202,7 @@ public class DJILib {
     ])
     
     // THis is with A pin-code and the secundar command merged into one
-    public static let authCommandOA5Prov2 = Data([
+    private let authCommandOA5Prov2 = Data([
         0x20, 0x32, 0x38, 0x34, 0x61, 0x65, 0x35, 0x62,
         0x38, 0x64, 0x37, 0x36, 0x62, 0x33, 0x33, 0x37,
         0x35, 0x61, 0x30, 0x34, 0x61, 0x36, 0x34, 0x31,
@@ -215,7 +214,7 @@ public class DJILib {
     ])
     
     // I have idea what thi sis.
-    public static let authCommandOA5Pro = Data([
+    private let authCommandOA5Pro = Data([
         0x0F, 0x30, 0x30, 0x31, 0x36, 0x37, 0x31, 0x39,
         0x31, 0x30, 0x36, 0x35, 0x36, 0x31, 0x34, 0x36,
         0x04
@@ -224,7 +223,7 @@ public class DJILib {
     // Authenticate-command
     
     /// Get the command to authenticate with the camera
-    public func getAuthCommand(pin: String) -> Data{
+    public static func getAuthCommand(pin: String, countBit: Data) -> Data{
         // TODO: Make function that can generate the generated bits
         // TODO: Strip the generated bits from the rawCommand
         // TODO: Inject the space (0x04) and the four bytes that is the pin
@@ -234,7 +233,7 @@ public class DJILib {
         
         let commandBytes = Data([0x02, 0x07])
         
-        let idBytes = getNextCountBits()
+        //let idBytes = getNextCountBits()
         
         let typeBytes = Data([0x40, 0x07, 0x45])
         
@@ -242,7 +241,7 @@ public class DJILib {
         
         dataBytes.append(stringToHexData(pin))
         
-        let fullPayload = generateFullPayload(command: commandBytes, id: idBytes, type: typeBytes, data: dataBytes)
+        let fullPayload = DJILib.generateFullPayload(command: commandBytes, id: countBit, type: typeBytes, data: dataBytes)
         
         return fullPayload!
     }
@@ -274,7 +273,7 @@ public class DJILib {
     ]) //0x68, 0x6D
     
     
-    public func get_start_broadcast_command() -> Data {
+    public static func get_start_broadcast_command() -> Data {
         return updateChecksumBits(payload: DJILib.set_broadcast_command)
     }
     
@@ -282,24 +281,24 @@ public class DJILib {
         return Data([0x55, 0x0E, 0x04, 0x66, 0x02, 0x08, 0x12, 0x8C, 0x40, 0x02, 0xE1, 0x1A, 0x11, 0xDF])
     }
     
-    public func get_stop_broadcast_command() -> Data {
+    public static func get_stop_broadcast_command() -> Data {
         var stopCommand = DJILib.set_broadcast_command
         stopCommand[16] = 0x02
         return updateChecksumBits(payload: stopCommand)
     }
     
-    private func getBitrateHexes(bitrate: Int) -> Data{
+    private static func getBitrateHexes(bitrate: Int) -> Data{
         let highByte = UInt8((bitrate >> 8) & 0xFF)
         let lowByte = UInt8(bitrate & 0xFF)
             
         return Data([highByte, lowByte])
     }
     
-    private func getCountDataBit(_ data: Data) -> Data {
+    private static func getCountDataBit(_ data: Data) -> Data {
         return Data([UInt8(data.count)])
     }
     
-    public func getWiFiConfigurationCommand(ssid: String, password: String) -> Data{
+    public static func getWiFiConfigurationCommand(ssid: String, password: String) -> Data{
         
         print("ssid \(ssid) Password: \(password)")
         
@@ -321,7 +320,7 @@ public class DJILib {
     }
     
     
-    public func getRTMPConfigCommand(rtmpURL: String, bitrate: Int, resolution: DJILib.BroadcastResolution, fps: Int, auto: Bool, eis: DJILib.BroadcastEISMode) -> Data{
+    public static func getRTMPConfigCommand(rtmpURL: String, bitrate: Int, resolution: DJILib.BroadcastResolution, fps: Int, auto: Bool, eis: DJILib.BroadcastEISMode, countBit: Data) -> Data{
         
         // Two first bits unknown, Next 5 is Stream settings. Rest us currently unknown
         _ = Data([0x27, 0x00, 0x0A, 0x70, 0x17, 0x02, 0x00, 0x03, 0x00, 0x00, 0x00, 0x1C, 0x00])
@@ -398,7 +397,7 @@ public class DJILib {
         }
         let eisPayload = generateFullPayload(
             command: Data([0x02, 0x01]),
-            id: getNextCountBits(),
+            id: countBit,
             type: Data([0x40, 0x02, 0x8E]),
             data: eisMessage
         )
@@ -457,7 +456,7 @@ public class DJILib {
     }
  
     
-    func updateChecksumBits(payload: Data) -> Data {
+    private static func updateChecksumBits(payload: Data) -> Data {
         print("DJILIB - Original payload is: \(payload.hexEncodedString()) ")
         var updatedPayload = payload
         // Set Size-bit
@@ -478,7 +477,7 @@ public class DJILib {
     }
     
     
-    private func djiCrc8(data: Data) -> Data {
+    private static func djiCrc8(data: Data) -> Data {
         let crc8 = CrcSwift.computeCrc8(
             data,
             initialCrc: 0xEE,
@@ -491,7 +490,7 @@ public class DJILib {
         return Data([crc8])
     }
 
-    private func djiCrc16(data: Data) -> Data {
+    private static func djiCrc16(data: Data) -> Data {
         let crc16 = CrcSwift.computeCrc16(
             data,
             initialCrc: 0x496C,
@@ -504,7 +503,7 @@ public class DJILib {
         return hashData
     }
     
-    private func generateSizeBit(data: Data) -> Data{
+    private static func generateSizeBit(data: Data) -> Data{
         // Return a Data object containing the hex of the length of fullCommand
         let size = data.count + 2 // We add to to make sure we count the not yet added crc bits
         return Data([UInt8(size)])
