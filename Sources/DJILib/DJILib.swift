@@ -10,7 +10,11 @@ import CrcSwift
 /// This library will increment that automaticly so its important that wherever you implement this, you init the class instead of staticly call it.
 public class DJILib {
     
-    
+    // TODO: Move this id-bit out of the class.
+    // as i want to make this into fully static class, i need to move the responsibility
+    // of iterating this byte onto the implementing app.
+    // So i should remove this, but instead add a static function that iterates the inputted value for them.
+    // countBit = DJILib.iterateCountBit(countBit: Data)
     var idBytes: Data = Data([0x00, 0x00])
     
     public enum Model {
