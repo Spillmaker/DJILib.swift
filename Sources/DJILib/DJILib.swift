@@ -87,7 +87,8 @@ public class DJILib {
     /// - Parameters:
     ///     - command: DJI Commands are identified with their 2 Bytes ID. Note that responses flips the bytes, so for example if your
     ///     command is ``0x00, 0xFF``, the event that is a reply to that command would be ``0xFF, 0x00``
-    ///     - id: Unique 2 bytes incremental ID for each message being sent to the device. You will find this id being used in the event that is a direct response to your command.
+    ///     - id: Unique 2 bytes incremental ID for each message being sent to the device.
+    ///       You will find this id being used in the event that is a direct response to your command.
     ///     - type: Sort of a 3 bytes category for the command. This is often if not always linked to the command bytes
     ///          TODO: Make a comprehensible list of all avaliable categories
     ///   - data: The payload of the message. dynamic length
@@ -285,7 +286,15 @@ public class DJILib {
         return payload!
     }
     
-    public static func getRTMPConfigCommand(rtmpURL: String, bitrate: Int, resolution: DJILib.BroadcastResolution, fps: Int, auto: Bool, eis: DJILib.BroadcastEISMode, countBit: Data) -> Data{
+    public static func getRTMPConfigCommand(
+        rtmpURL: String,
+        bitrate: Int,
+        resolution: DJILib.BroadcastResolution,
+        fps: Int,
+        auto: Bool,
+        eis: DJILib.BroadcastEISMode,
+        countBit: Data
+    ) -> Data{
         
         // Two first bits unknown, Next 5 is Stream settings. Rest us currently unknown
         _ = Data([0x27, 0x00, 0x0A, 0x70, 0x17, 0x02, 0x00, 0x03, 0x00, 0x00, 0x00, 0x1C, 0x00])
