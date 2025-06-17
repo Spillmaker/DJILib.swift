@@ -27,14 +27,14 @@ import Foundation
 }
 
 @Test func rtmpUrlByteLengthCheck() async throws {
-    let djilb = DJILib()
-    let rtmpTest = djilb.getRTMPConfigCommand(
+    let rtmpTest = DJILib.getRTMPConfigCommand(
         rtmpURL: "rtmp://192.168.1.123/publish/live/a/test", // should expect 0x28 in response base on this URL.
         bitrate: 3000,
         resolution: .fhd,
         fps: 30,
         auto: false,
-        eis: .rockSteady
+        eis: .rockSteady,
+        countBit: Data([0x00,0x00])
     )
     
     
