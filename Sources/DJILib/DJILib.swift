@@ -1,8 +1,18 @@
 import Foundation
 import CrcSwift
 
+/// TODO:
+/// - Convert into non-static class
+/// - Convert into singleton class
+
+/// This is not a static class
+/// Even tho a lot of the functions are defined as static, the final payload requires a id-byte that increments.
+/// This library will increment that automaticly so its important that wherever you implement this, you init the class instead of staticly call it.
 public class DJILib {
-  
+    
+    
+    var idBytes: Data = Data([0x00, 0x00])
+    
     public enum Model {
         case oa3
         case oa4
@@ -63,9 +73,6 @@ public class DJILib {
     public static let manufacturerDataOsmoAction5ProId     = Data([0x15, 0x00])
     public static let manufacturerDataOsmoPocket3Id        = Data([0x20, 0x00])
     
-    
-    
-    
     private static let readCharacteristicsUUID   = Data([0xFF, 0xF4])
     private static let writeCharacteristicsUUID  = Data([0xFF, 0xF5])
     private static let oa5WriteCharacteristicsUUID = Data([0xFF, 0xF3])
@@ -84,7 +91,7 @@ public class DJILib {
     
     public static let part_cmd_startbit                    = Data([0x55])
     
-    var idBytes: Data = Data([0x00, 0x00])
+    
     
     
     // Command Generator
