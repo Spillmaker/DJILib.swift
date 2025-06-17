@@ -249,7 +249,7 @@ public class DJILib {
         return updateChecksumBits(payload: DJILib.set_broadcast_command)
     }
     
-    public func get_initiate_broadcast_command() -> Data {
+    public static func get_initiate_broadcast_command() -> Data {
         return Data([0x55, 0x0E, 0x04, 0x66, 0x02, 0x08, 0x12, 0x8C, 0x40, 0x02, 0xE1, 0x1A, 0x11, 0xDF])
     }
     
