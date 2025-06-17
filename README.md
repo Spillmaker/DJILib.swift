@@ -1,3 +1,8 @@
+# Prerelease warning
+This is currently in a prerelease. The versioning is still not stable so if you are implementing this version of it,
+be warned that stuff may change drasticly. Feel free to wait until the tagged version is 1.0.0 or above, or until
+this message is gone from the readme.
+
 # DJILib.swift
 
 DJILib.swift is a swift-library that enables communication between your livestreaming-app and various cameras sold under
