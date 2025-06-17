@@ -547,7 +547,7 @@ public class DJILib {
         
     }
     
-    public func parseNotifyMessage(_ data: Data, model: Model) -> Message{
+    public static func parseNotifyMessage(_ data: Data, model: Model) -> Message{
         
         // If the payload is not large enough to parse a message, return unknown event.
         guard data.count >= 6 else {
@@ -678,7 +678,7 @@ public class DJILib {
         return DJILib.UnknownEvent(rawData: data)
     }
     
-    func parseWifiListMessage(data: Data, model: Model) -> DJILib.WifiListEvent?{
+    static func parseWifiListMessage(data: Data, model: Model) -> DJILib.WifiListEvent?{
         
         guard data[0] == 0x55 else {
             return nil
@@ -741,7 +741,7 @@ public class DJILib {
         return wifiListMessage
     }
     
-    private func twoBitsToDecimal(bits: [UInt8]) -> UInt16 {
+    private static func twoBitsToDecimal(bits: [UInt8]) -> UInt16 {
         // Ensure we have at least two bytes in the array
         guard bits.count >= 2 else {
             return 0
