@@ -1,21 +1,7 @@
 import Foundation
 import CrcSwift
 
-/// TODO:
-/// - Convert into non-static class
-/// - Convert into singleton class
-
-/// This is not a static class
-/// Even tho a lot of the functions are defined as static, the final payload requires a id-byte that increments.
-/// This library will increment that automaticly so its important that wherever you implement this, you init the class instead of staticly call it.
 public class DJILib {
-    
-    // TODO: Move this id-bit out of the class.
-    // as i want to make this into fully static class, i need to move the responsibility
-    // of iterating this byte onto the implementing app.
-    // So i should remove this, but instead add a static function that iterates the inputted value for them.
-    // countBit = DJILib.iterateCountBit(countBit: Data)
-    //var idBytes: Data = Data([0x00, 0x00])
     
     public enum Model {
         case oa3
@@ -68,7 +54,6 @@ public class DJILib {
         }
     }
     
-    
     /// DJi uses the two first bytes in the manufacturer-data to identify that it is a DJI-device.
     public static let manufacturerDataIdentifier: Data     = Data([0xAA, 0x08])
     
@@ -94,9 +79,6 @@ public class DJILib {
     }
     
     public static let part_cmd_startbit                    = Data([0x55])
-    
-    
-    
     
     // Command Generator
     /// # Generate Payload
@@ -165,7 +147,6 @@ public class DJILib {
         // Finalize with ending with a crc16 hash
         fullData.append(djiCrc16(data: fullData))
         
-        print("Generated Full payload: \(fullData.hexEncodedString()) ")
         return fullData
     }
     
@@ -185,7 +166,6 @@ public class DJILib {
                 
         return nextBits
     }
-    
     
     private static func stringToHexData(_ input: String) -> Data {
         return Data(input.utf8.map { $0 })
@@ -220,8 +200,6 @@ public class DJILib {
         0x04
     ])
     
-    // Authenticate-command
-    
     /// Get the command to authenticate with the camera
     public static func getAuthCommand(pin: String, countBit: Data) -> Data{
         // TODO: Make function that can generate the generated bits
@@ -246,8 +224,6 @@ public class DJILib {
         return fullPayload!
     }
     
-    // Broadcast-commands
-    
     /// # Set Broadcast state command
     ///
     /// Required for DJI Osmo Action 5 Pro to be sent after WiFi, RTMP and Preferences commands to successfully start the broadcast.
@@ -271,7 +247,6 @@ public class DJILib {
         0x40, 0x02, 0x8E, 0x01, 0x01, 0x1A, 0x00, 0x01,
         0x01
     ]) //0x68, 0x6D
-    
     
     public static func get_start_broadcast_command() -> Data {
         return updateChecksumBits(payload: DJILib.set_broadcast_command)
@@ -315,10 +290,8 @@ public class DJILib {
             type: Data([0x40, 0x07, 0x47]),
             data: message
         )
-        Logger.log("Sending WiFi credentials to camera: \(payload?.hexEncodedString() ?? "No Data") ", level: .info)
         return payload!
     }
-    
     
     public static func getRTMPConfigCommand(rtmpURL: String, bitrate: Int, resolution: DJILib.BroadcastResolution, fps: Int, auto: Bool, eis: DJILib.BroadcastEISMode, countBit: Data) -> Data{
         
@@ -402,39 +375,24 @@ public class DJILib {
             data: eisMessage
         )
         
-        Logger.log("Generated secondary (EIS) Livestream-command: \(eisPayload?.hexEncodedString() ?? "No Data")", level: .info)
         payload?.append(eisPayload!)
         
 
         
         let updatedCommandDemo = get_start_broadcast_command()
-        Logger.log("Generated Third livestream-command needed for OA5P: \(updatedCommandDemo.hexEncodedString())", level: .info)
 
         payload?.append(updatedCommandDemo)
-        Logger.log("Generated full Livestream-command: \(payload?.hexEncodedString() ?? "No Data")", level: .info)
 
         return payload!
-    }
-    
-    private static func log(_ items: Any..., separator: String = " ", terminator: String = "\n") {
-        let prefix = "🔹 "
-        let message = items.map { String(describing: $0) }.joined(separator: separator)
-        Swift.print(prefix + message, terminator: terminator)
-    }
-
-    public init(){
-        print("DJILIB Initiated")
     }
     
     public static func getModelFromManufacturerData(manufacturerData: Data) -> Model? {
         
         guard manufacturerData.count >= 4 else {
-            log("Recieved invalid manufacturer-data")
             return nil
         }
         
         guard manufacturerData[0 ... 1] == manufacturerDataIdentifier else {
-            log("Manufacturer-data not identified as a DJI-device.")
             return nil
         }
         
@@ -448,16 +406,13 @@ public class DJILib {
         case manufacturerDataOsmoPocket3Id:
             return .op3
         default:
-            log("Could not idenfity DJI-device", manufacturerData)
             return nil
         }
         
 
     }
- 
     
     private static func updateChecksumBits(payload: Data) -> Data {
-        print("DJILIB - Original payload is: \(payload.hexEncodedString()) ")
         var updatedPayload = payload
         // Set Size-bit
         updatedPayload[1] = generateSizeBit(data: payload)[0]
@@ -471,11 +426,9 @@ public class DJILib {
         
         //0x68, 0x6D
         
-        print("DJILIB - Updated payload is: \(updatedPayload.hexEncodedString()) ")
         return updatedPayload
         
     }
-    
     
     private static func djiCrc8(data: Data) -> Data {
         let crc8 = CrcSwift.computeCrc8(
@@ -508,8 +461,6 @@ public class DJILib {
         let size = data.count + 2 // We add to to make sure we count the not yet added crc bits
         return Data([UInt8(size)])
     }
-    
-    
     
     public protocol Message {
         var rawData: Data {get set}
@@ -705,8 +656,6 @@ public class DJILib {
             
             if(data[9] == 0xee && data[10] == 0x03){
                 // This is a response to sending the start broadcast command.
-                print("Broadcast-event update: \(data.subdata(in: 9..<11).hexEncodedString())")
-                print("Full payload: " + data.hexEncodedString())
                 
                 // If data[12] is 0x09, the camera is in start broadcasting mode, and we can proceed to
                 // send in wifi-credentials
@@ -733,7 +682,6 @@ public class DJILib {
         
         return DJILib.UnknownEvent(rawData: data)
     }
-    
     
     func parseWifiListMessage(data: Data, model: Model) -> DJILib.WifiListEvent?{
         
@@ -801,8 +749,6 @@ public class DJILib {
         return wifiListMessage
     }
     
-    
-    
     private func twoBitsToDecimal(bits: [UInt8]) -> UInt16 {
         // Ensure we have at least two bytes in the array
         guard bits.count >= 2 else {
@@ -818,15 +764,3 @@ public class DJILib {
     
 }
 
-
-extension Data {
-    struct HexEncodingOptions: OptionSet {
-        let rawValue: Int
-        static let upperCase = HexEncodingOptions(rawValue: 1 << 0)
-    }
-
-    func hexEncodedString(options: HexEncodingOptions = []) -> String {
-        let format = options.contains(.upperCase) ? "%02hhX" : "%02hhx"
-        return self.map { String(format: format, $0) }.joined(separator: " ")
-    }
-}
