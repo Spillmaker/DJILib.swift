@@ -92,20 +92,16 @@ public class DJILib {
     ///          TODO: Make a comprehensible list of all avaliable categories
     ///   - data: The payload of the message. dynamic length
     private static func generateFullPayload(command: Data, id: Data, type: Data, data: Data) -> Data? {
-        print("Sending dji command")
         
         guard command.count == 2 else {
-            print("Command must be exactly 2 bits")
             return nil // Return nil if data does not have exactly 2 bytes
         }
         
         guard id.count == 2 else {
-            print("ID must be exactly 2 bits")
             return nil // Return nil if data does not have exactly 2 bytes
         }
         
         guard type.count == 3 || type.count == 4 else {
-            print("Type must be exactly 3 or 4 bits")
             return nil // Return nil if data does not have exactly 2 bytes
         }
         
@@ -274,10 +270,6 @@ public class DJILib {
     }
     
     public static func getWiFiConfigurationCommand(ssid: String, password: String) -> Data{
-        
-        print("ssid \(ssid) Password: \(password)")
-        
-
         var message: Data = Data()
         message.append(getCountDataBit(ssid.data(using: .utf8)!)) // The length of the SSID
         message.append(Data(ssid.data(using: .utf8)!)) // The SSID
@@ -598,8 +590,6 @@ public class DJILib {
                     // User approved the pin-code, and we are now authenticated
                     return DJILib.AuthEvent(rawData: data, isAuthenticated: true)
                 }
-                Logger.log("Unknown Pairing response", level: .warning)
-                
             }
             
             // Type: Event whenever user has approved the auth
@@ -617,19 +607,15 @@ public class DJILib {
                 if(data[11] == 0x02){
                     return DJILib.AuthEvent(rawData: data, isAuthenticated: false)
                 }
-                // Pairing has been validated.
-                Logger.log("Unknown Auth event response", level: .warning)
             }
             
             // Type: Wireless SSID entry result
             if(data[9] == 0x07 && data[10] == 0x47){
                 if(data[11] == 0x00){
-                    //print("Connected to WiFi")
                     return DJILib.WifiListEvent(rawData: data, wifiStatus: .connected, wifiItems: [])
                 }
                 
                 if(data[11] == 0x01){
-                    //print("Could not connect to wifi")
                     return DJILib.WifiListEvent(rawData: data, wifiStatus: .connectionFailed, wifiItems: [])
                 }
                 
@@ -686,12 +672,10 @@ public class DJILib {
     func parseWifiListMessage(data: Data, model: Model) -> DJILib.WifiListEvent?{
         
         guard data[0] == 0x55 else {
-            print("[DJIDevice] Invalid message type. Must be full event from the camera.")
             return nil
         }
         
         guard data[4] == 0x07 && data[5] == 0x02 else {
-            print("[DJIDevice] Invalid message type. Must be of category wifi (0x07 0x02)")
             return nil
         }
         
@@ -728,7 +712,6 @@ public class DJILib {
             }else if wifiItem[4] == 0x00 {
                 band = ._2_4GHz
             } else {
-                print("Unknown band")
                 return nil
             }
             
@@ -752,7 +735,6 @@ public class DJILib {
     private func twoBitsToDecimal(bits: [UInt8]) -> UInt16 {
         // Ensure we have at least two bytes in the array
         guard bits.count >= 2 else {
-            print("Error: Not enough bytes provided")
             return 0
         }
         
