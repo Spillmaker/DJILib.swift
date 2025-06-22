@@ -652,6 +652,11 @@ public class DJILib {
             if(data[9] == 0xee && data[10] == 0x03){
                 // This is a response to sending the start broadcast command.
                 
+                // If data[12] is 0x08, the stream is live and we are getting metrics.
+                if(data[12] == 0x08){
+                    return DJILib.BroadcastEvent(rawData: data, status: .live)
+                }
+                
                 // If data[12] is 0x09, the camera is in start broadcasting mode, and we can proceed to
                 // send in wifi-credentials
                 if(data[12] == 0x09){
