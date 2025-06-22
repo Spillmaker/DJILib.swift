@@ -29,13 +29,14 @@ public class DJILib {
         case authorized
     }
     
-    public enum BroadcastStatus {
-        case inactive
-        case preparing
-        case readyForWiFiCredentials
-        case readyForRTMPCredentials
-        case connecting
-        case live
+    /// Please only use the int-value for order. Not specific falues as new values may be introduced in between.
+    public enum BroadcastStatus: Int {
+        case inactive = 0
+        case preparing = 10
+        case readyForWiFiCredentials = 20
+        case readyForRTMPCredentials = 30
+        case connecting = 40
+        case live = 50
     }
     
     public struct Statistics: Identifiable {
