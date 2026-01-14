@@ -12,6 +12,13 @@ the DJI brand.
 - DJI Osmo Action 4
 - DJI Osmo Action 5 Pro
 
+# Allegedly supported devices
+These are devices that i personally does not own, but ive gotten reported that they work. But as i cant test myself, these are unsupported by me.
+- DJI Osmo Pocket 3
+- Xtra Edge
+- Xtra Edge Pro
+- Xtra Muse
+
 Do you want your device supported? Consider sponsoring me so that i can purchase the device. Its not possible to support
 a device i do not own myself.
 
@@ -33,5 +40,5 @@ the write characteristic.
 - There may be comments on each function so make sure to read the codebase.
 
 # Support
-I dont have the capacity to provide free support. If you want me to implement this library in your application,
-I may be open for work. Feel free to contact me.
+Open a ticket, and maybe i can look into it. But please check the list of supported devices.
+If you want me to implement this library in your application,i may be open for work. Feel free to contact me.

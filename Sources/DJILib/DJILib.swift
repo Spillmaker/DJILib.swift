@@ -56,7 +56,12 @@ public class DJILib {
     }
     
     /// DJi uses the two first bytes in the manufacturer-data to identify that it is a DJI-device.
+    @available(*, deprecated, message: "To add support for shell-companies, please use the function for checking manufacturer-identifier instead, as there are now multiple.")
     public static let manufacturerDataIdentifier: Data     = Data([0xAA, 0x08])
+    
+    public static let companyIdDjiLtd: Data                = Data([0xAA, 0x08])
+    public static let companyIdXtraLtd: Data               = Data([0xAA, 0xF7])
+    public static let companyIDArray: [Data]               = [DJILib.companyIdDjiLtd, DJILib.companyIdXtraLtd]
     
     public static let manufacturerDataOsmoAction3Id        = Data([0x12, 0x00])
     public static let manufacturerDataOsmoAction4Id        = Data([0x14, 0x00])
@@ -394,7 +399,9 @@ public class DJILib {
             return nil
         }
         
-        guard manufacturerData[0 ... 1] == manufacturerDataIdentifier else {
+        let companyId = manufacturerData.prefix(2)
+
+        guard DJILib.companyIDArray.contains(companyId) else {
             return nil
         }
         

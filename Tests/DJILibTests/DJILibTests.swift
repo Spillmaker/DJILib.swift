@@ -18,11 +18,16 @@ import Foundation
     // Test valid DJI, but invalid rest.
     #expect( DJILib.getModelFromManufacturerData(manufacturerData: Data([0xAA, 0x08, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF]) ) == nil)
     
-    // Test valid Osmo Pocket 3
+    // Valid tests for DJI
     #expect( DJILib.getModelFromManufacturerData(manufacturerData: Data([0xAA, 0x08, 0x12, 0x00]) ) == .oa3)
     #expect( DJILib.getModelFromManufacturerData(manufacturerData: Data([0xAA, 0x08, 0x14, 0x00]) ) == .oa4)
     #expect( DJILib.getModelFromManufacturerData(manufacturerData: Data([0xAA, 0x08, 0x15, 0x00]) ) == .oa5pro)
     #expect( DJILib.getModelFromManufacturerData(manufacturerData: Data([0xAA, 0x08, 0x20, 0x00]) ) == .op3)
+    
+    // Valid tests for Xtra (WIP)
+    #expect( DJILib.getModelFromManufacturerData(manufacturerData: Data([0xAA, 0xF7, 0x14, 0x00]) ) == .oa4)    // ALLEGEDLY Xtra Edge
+    #expect( DJILib.getModelFromManufacturerData(manufacturerData: Data([0xAA, 0xF7, 0x15, 0x00]) ) == .oa5pro) // ALLEGEDLY Xtra Edge Pro
+    #expect( DJILib.getModelFromManufacturerData(manufacturerData: Data([0xAA, 0xF7, 0x20, 0x00]) ) == .op3)    // Xtra Muse
     
 }
 
